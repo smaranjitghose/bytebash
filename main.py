@@ -3,6 +3,7 @@ import sys
 from io import StringIO
 import base64
 from pathlib import Path
+from streamlit_ace import st_ace
 
 # Load logo as base64
 def load_logo():
@@ -130,6 +131,10 @@ def outputs_match(expected, actual):
 # Initialize session state
 if 'test_cases' not in st.session_state:
     st.session_state.test_cases = [("", "") for _ in range(7)]
+if 'editor_key' not in st.session_state:
+    st.session_state.editor_key = "code_editor_0"
+if 'current_code' not in st.session_state:
+    st.session_state.current_code = ""
 
 # Dark-mode friendly styles & scroll styling
 st.markdown("""
@@ -170,6 +175,15 @@ st.markdown("""
 .scrollable-test-cases::-webkit-scrollbar-thumb:hover {
     background: #777;
 }
+/* Style the ace editor container to match the dark theme */
+.ace_editor {
+    border: 1px solid #555 !important;
+    border-radius: 6px !important;
+}
+.ace_gutter {
+    background: #2d2d2d !important;
+    border-right: 1px solid #555 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -185,16 +199,22 @@ with st.sidebar:
     
     if st.button("📥 Load Example") and selected_example != "Select an example...":
         problem = EXAMPLE_PROBLEMS[selected_example]
-        st.session_state.code = problem["code"]
+        st.session_state.current_code = problem["code"]
         st.session_state.test_cases = problem["test_cases"]
         st.session_state.example_description = problem["description"]
+        # Change the editor key to force recreation
+        current_key_num = int(st.session_state.editor_key.split("_")[-1])
+        st.session_state.editor_key = f"code_editor_{current_key_num + 1}"
         st.rerun()
     
     if st.button("🗑️ Clear All"):
-        st.session_state.code = ""
+        st.session_state.current_code = ""
         st.session_state.test_cases = [("", "") for _ in range(7)]
         if 'example_description' in st.session_state:
             del st.session_state.example_description
+        # Change the editor key to force recreation
+        current_key_num = int(st.session_state.editor_key.split("_")[-1])
+        st.session_state.editor_key = f"code_editor_{current_key_num + 1}"
         st.rerun()
 
 # Layout with adjusted column ratio
@@ -207,13 +227,24 @@ with col_code:
     if 'example_description' in st.session_state:
         st.info(f"**Problem:** {st.session_state.example_description}")
 
-    code = st.text_area(
-        "Enter your Python code here:",
+    st.write("**Enter your Python code:**")
+    code = st_ace(
+        value=st.session_state.current_code,
+        language='python',
+        theme='monokai',
+        key=st.session_state.editor_key,  # Dynamic key
         height=400,
-        placeholder="# Example:\na = int(input())\nb = int(input())\nprint(a+b)",
-        value=st.session_state.get('code', ''),
-        key="code_input"
+        auto_update=True,
+        font_size=14,
+        tab_size=4,
+        show_gutter=True,
+        show_print_margin=True,
+        wrap=False,
+        annotations=None
     )
+    
+    # Update current_code when user types
+    st.session_state.current_code = code
 
 # Test case column
 with col_tests:
@@ -347,8 +378,6 @@ with col_branding:
         </div>
         """, unsafe_allow_html=True)
 
-# Save state
-if code != st.session_state.get('code', ''):
-    st.session_state.code = code
+# Save state - code is already saved above
 for i, (inp, exp) in enumerate(test_cases):
     st.session_state.test_cases[i] = (inp, exp)

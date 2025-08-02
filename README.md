@@ -121,9 +121,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [x] Whitespace-insensitive & multi-line matching
 - [x] Numeric-close comparison (floating point tolerance)
-- [ ] Highlight failed outputs in red, passed in green
+- [X] Syntax highlighting, line numbers, auto-indent in code editor | Streamlit Ace & Complex Session Management
 - [ ] Quick Start button to auto-load & run default example
-- [ ] Syntax highlighting, line numbers, auto-indent in code editor
 - [ ] Add/remove test cases dynamically
 - [ ] Optional auto-run tests on code change
 - [ ] Collapsible example descriptions
