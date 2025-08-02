@@ -1,84 +1,9 @@
-# main.py - Main application for ByteBash v1 Py
-
 import streamlit as st
 import sys
 from io import StringIO
-import base64
-from pathlib import Path
 from streamlit_ace import st_ace
 from problems import EXAMPLE_PROBLEMS
-
-# Load logo as base64
-def load_logo():
-    logo_path = Path("bytexl_logo.png")
-    if logo_path.exists():
-        with open(logo_path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-    return None
-
-# Output comparison function
-def outputs_match(expected, actual):
-    import re
-    
-    exp = expected.strip()
-    act = actual.strip()
-    
-    # Handle empty outputs
-    if not exp and not act:
-        return True
-    
-    # 1. Exact match (preserves all formatting)
-    if exp == act:
-        return True
-    
-    # 2. Case-insensitive exact match
-    if exp.lower() == act.lower():
-        return True
-    
-    # 3. Trailing whitespace tolerant (preserve internal structure)
-    exp_lines = [line.rstrip() for line in exp.split('\n')]
-    act_lines = [line.rstrip() for line in act.split('\n')]
-    if exp_lines == act_lines:
-        return True
-    
-    # 4. Case-insensitive + trailing whitespace tolerant
-    exp_lines_lower = [line.rstrip().lower() for line in exp.split('\n')]
-    act_lines_lower = [line.rstrip().lower() for line in act.split('\n')]
-    if exp_lines_lower == act_lines_lower:
-        return True
-    
-    # 5. Numeric comparison with tolerance (for floating point)
-    try:
-        exp_num = float(exp)
-        act_num = float(act)
-        # Use relative tolerance for large numbers, absolute for small
-        tolerance = max(1e-9, abs(exp_num) * 1e-9)
-        if abs(exp_num - act_num) <= tolerance:
-            return True
-    except:
-        pass
-    
-    # 5b. Multiple numbers comparison (space/line separated)
-    try:
-        import re
-        exp_nums = [float(x) for x in re.findall(r'-?\d+\.?\d*', exp)]
-        act_nums = [float(x) for x in re.findall(r'-?\d+\.?\d*', act)]
-        if len(exp_nums) == len(act_nums) and len(exp_nums) > 0:
-            tolerance = 1e-9
-            if all(abs(e - a) <= max(tolerance, abs(e) * tolerance) for e, a in zip(exp_nums, act_nums)):
-                return True
-    except:
-        pass
-    
-    # 6. Only as last resort: relaxed whitespace (for simple text answers)
-    # Skip this for multi-line outputs to preserve patterns
-    if '\n' not in exp and '\n' not in act:
-        exp_relaxed = re.sub(r'\s+', ' ', exp).strip()
-        act_relaxed = re.sub(r'\s+', ' ', act).strip()
-        if exp_relaxed.lower() == act_relaxed.lower():
-            return True
-    
-    return False
+from utils import load_logo, outputs_match
 
 def main():
     logo_base64 = load_logo()

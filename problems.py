@@ -1,5 +1,3 @@
-# problems.py - Problem definitions for ByteBash v1 Py
-
 EXAMPLE_PROBLEMS = {
     "Beginner: Sum of Two Numbers": {
         "description": "Read two integers and calculate their sum - Entry level problem for new learners",
