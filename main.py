@@ -65,15 +65,50 @@ EXAMPLE_PROBLEMS = {
 
 # Output comparison function
 def outputs_match(expected, actual):
+    import re
+    
     exp = expected.strip()
     act = actual.strip()
+    
+    # Handle empty outputs
+    if not exp and not act:
+        return True
+    
+    # 1. Exact match (preserves all formatting)
+    if exp == act:
+        return True
+    
+    # 2. Case-insensitive exact match
     if exp.lower() == act.lower():
         return True
+    
+    # 3. Trailing whitespace tolerant (preserve internal structure)
+    exp_lines = [line.rstrip() for line in exp.split('\n')]
+    act_lines = [line.rstrip() for line in act.split('\n')]
+    if exp_lines == act_lines:
+        return True
+    
+    # 4. Case-insensitive + trailing whitespace tolerant
+    exp_lines_lower = [line.rstrip().lower() for line in exp.split('\n')]
+    act_lines_lower = [line.rstrip().lower() for line in act.split('\n')]
+    if exp_lines_lower == act_lines_lower:
+        return True
+    
+    # 5. Numeric comparison (for single numbers)
     try:
         if float(exp) == float(act):
             return True
     except:
         pass
+    
+    # 6. Only as last resort: relaxed whitespace (for simple text answers)
+    # Skip this for multi-line outputs to preserve patterns
+    if '\n' not in exp and '\n' not in act:
+        exp_relaxed = re.sub(r'\s+', ' ', exp).strip()
+        act_relaxed = re.sub(r'\s+', ' ', act).strip()
+        if exp_relaxed.lower() == act_relaxed.lower():
+            return True
+    
     return False
 
 # Initialize session state
