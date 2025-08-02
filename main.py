@@ -23,6 +23,8 @@ def main():
         st.session_state.editor_key = "code_editor_0"
     if 'current_code' not in st.session_state:
         st.session_state.current_code = ""
+    if 'num_test_cases' not in st.session_state:
+        st.session_state.num_test_cases = 7
 
     # Dark-mode friendly styles & scroll styling
     st.markdown("""
@@ -89,6 +91,7 @@ def main():
             problem = EXAMPLE_PROBLEMS[selected_example]
             st.session_state.current_code = problem["code"]
             st.session_state.test_cases = problem["test_cases"]
+            st.session_state.num_test_cases = len(problem["test_cases"])
             st.session_state.example_description = problem["description"]
             # Change the editor key to force recreation
             current_key_num = int(st.session_state.editor_key.split("_")[-1])
@@ -98,6 +101,7 @@ def main():
         if st.button("🗑️ Clear All"):
             st.session_state.current_code = ""
             st.session_state.test_cases = [("", "") for _ in range(7)]
+            st.session_state.num_test_cases = 7
             if 'example_description' in st.session_state:
                 del st.session_state.example_description
             # Change the editor key to force recreation
@@ -137,14 +141,40 @@ def main():
     # Test case column
     with col_tests:
         st.subheader("Test Cases")
-        run_tests = st.button("▶️ Run Tests", type="primary")
+        
+        # Test case management controls
+        col_controls1, col_controls2, col_controls3 = st.columns([1, 1, 1])
+        
+        with col_controls1:
+            if st.button("➕ Add Test Case"):
+                st.session_state.test_cases.append(("", ""))
+                st.session_state.num_test_cases += 1
+                st.rerun()
+        
+        with col_controls2:
+            if st.button("➖ Remove Test Case") and st.session_state.num_test_cases > 2:
+                st.session_state.test_cases.pop()
+                st.session_state.num_test_cases -= 1
+                st.rerun()
+        
+        with col_controls3:
+            run_tests = st.button("▶️ Run Tests", type="primary")
+        
+        # Display current count
+        st.caption(f"Total Test Cases: {st.session_state.num_test_cases} (Min: 2)")
 
         st.markdown('<div class="scrollable-test-cases">', unsafe_allow_html=True)
         test_cases = []
-        for i in range(7):
+        
+        # Ensure we have at least the current number of test cases in session state
+        while len(st.session_state.test_cases) < st.session_state.num_test_cases:
+            st.session_state.test_cases.append(("", ""))
+        
+        # Display test cases dynamically
+        for i in range(st.session_state.num_test_cases):
             st.markdown(f'<div class="test-case-header">Test Case {i+1}</div>', unsafe_allow_html=True)
-            default_input = st.session_state.test_cases[i][0]
-            default_output = st.session_state.test_cases[i][1]
+            default_input = st.session_state.test_cases[i][0] if i < len(st.session_state.test_cases) else ""
+            default_output = st.session_state.test_cases[i][1] if i < len(st.session_state.test_cases) else ""
             test_input = st.text_area(
                 f"Input {i+1}:",
                 height=80,
@@ -192,13 +222,14 @@ def main():
                     sys.stdout = old_stdout
 
             # Summary
-            st.subheader(f"Results: {passed_count}/7 Tests Passed")
-            if passed_count == 7:
-                st.success(f"🎉 All tests passed! Great job!")
-            elif passed_count >= 5:
-                st.warning(f"⚠️ {passed_count} out of 7 tests passed. Almost there!")
+            total_tests = len(test_cases)
+            st.subheader(f"Results: {passed_count}/{total_tests} Tests Passed")
+            if passed_count == total_tests:
+                st.success(f"🎉 All {total_tests} tests passed! Great job!")
+            elif passed_count >= total_tests * 0.7:  # 70% threshold
+                st.warning(f"⚠️ {passed_count} out of {total_tests} tests passed. Almost there!")
             else:
-                st.error(f"❌ {passed_count} out of 7 tests passed. Keep trying!")
+                st.error(f"❌ {passed_count} out of {total_tests} tests passed. Keep trying!")
 
             # Details
             for idx, (inp, exp, out, passed) in enumerate(results, start=1):
@@ -269,7 +300,8 @@ def main():
 
     # Save state - code is already saved above
     for i, (inp, exp) in enumerate(test_cases):
-        st.session_state.test_cases[i] = (inp, exp)
+        if i < len(st.session_state.test_cases):
+            st.session_state.test_cases[i] = (inp, exp)
 
 if __name__ == "__main__":
     main()
