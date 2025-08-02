@@ -94,10 +94,26 @@ def outputs_match(expected, actual):
     if exp_lines_lower == act_lines_lower:
         return True
     
-    # 5. Numeric comparison (for single numbers)
+    # 5. Numeric comparison with tolerance (for floating point)
     try:
-        if float(exp) == float(act):
+        exp_num = float(exp)
+        act_num = float(act)
+        # Use relative tolerance for large numbers, absolute for small
+        tolerance = max(1e-9, abs(exp_num) * 1e-9)
+        if abs(exp_num - act_num) <= tolerance:
             return True
+    except:
+        pass
+    
+    # 5b. Multiple numbers comparison (space/line separated)
+    try:
+        import re
+        exp_nums = [float(x) for x in re.findall(r'-?\d+\.?\d*', exp)]
+        act_nums = [float(x) for x in re.findall(r'-?\d+\.?\d*', act)]
+        if len(exp_nums) == len(act_nums) and len(exp_nums) > 0:
+            tolerance = 1e-9
+            if all(abs(e - a) <= max(tolerance, abs(e) * tolerance) for e, a in zip(exp_nums, act_nums)):
+                return True
     except:
         pass
     
