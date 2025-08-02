@@ -123,7 +123,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [x] Numeric-close comparison (floating point tolerance)
 - [X] Syntax highlighting, line numbers, auto-indent in code editor | Streamlit Ace & Complex Session Management
 - [ ] Quick Start button to auto-load & run default example
-- [ ] Add/remove test cases dynamically
+- [X] Add/remove test cases dynamically
 - [ ] Optional auto-run tests on code change
 - [ ] Collapsible example descriptions
 - [ ] Resizable test case panel
