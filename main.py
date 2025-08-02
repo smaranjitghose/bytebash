@@ -122,32 +122,36 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Sidebar for Problem Selection
+with st.sidebar:
+    st.header("Problem Selection")
+    
+    selected_example = st.selectbox(
+        "Load Example Problem:",
+        ["Select an example..."] + list(EXAMPLE_PROBLEMS.keys()),
+        key="example_selector"
+    )
+    
+    if st.button("📥 Load Example") and selected_example != "Select an example...":
+        problem = EXAMPLE_PROBLEMS[selected_example]
+        st.session_state.code = problem["code"]
+        st.session_state.test_cases = problem["test_cases"]
+        st.session_state.example_description = problem["description"]
+        st.rerun()
+    
+    if st.button("🗑️ Clear All"):
+        st.session_state.code = ""
+        st.session_state.test_cases = [("", "") for _ in range(7)]
+        if 'example_description' in st.session_state:
+            del st.session_state.example_description
+        st.rerun()
+
 # Layout with adjusted column ratio
 col_code, col_tests = st.columns([1.2, 0.8])
 
 # Code column
 with col_code:
     st.subheader("Your Solution")
-    col_example, col_clear = st.columns([3, 1])
-    with col_example:
-        selected_example = st.selectbox(
-            "Load Example Problem:",
-            ["Select an example..."] + list(EXAMPLE_PROBLEMS.keys()),
-            key="example_selector"
-        )
-        if st.button("📥 Load Example") and selected_example != "Select an example...":
-            problem = EXAMPLE_PROBLEMS[selected_example]
-            st.session_state.code = problem["code"]
-            st.session_state.test_cases = problem["test_cases"]
-            st.session_state.example_description = problem["description"]
-            st.rerun()
-    with col_clear:
-        if st.button("🗑️ Clear All"):
-            st.session_state.code = ""
-            st.session_state.test_cases = [("", "") for _ in range(7)]
-            if 'example_description' in st.session_state:
-                del st.session_state.example_description
-            st.rerun()
 
     if 'example_description' in st.session_state:
         st.info(f"**Problem:** {st.session_state.example_description}")
