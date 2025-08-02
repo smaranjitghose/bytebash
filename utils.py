@@ -1,3 +1,5 @@
+# utils.py - Utility functions for ByteBash v1 Py
+
 import base64
 import re
 from pathlib import Path
@@ -9,6 +11,24 @@ def load_logo():
         with open(logo_path, "rb") as f:
             return base64.b64encode(f.read()).decode()
     return None
+
+def truncate_output(output, max_length=2000):
+    """
+    Truncate output to prevent excessive data from malicious code.
+    
+    Args:
+        output (str): Output string to truncate
+        max_length (int): Maximum allowed length (default: 2000 characters)
+        
+    Returns:
+        str: Truncated output with warning message if truncated
+    """
+    if len(output) <= max_length:
+        return output
+    
+    truncated = output[:max_length]
+    warning = f"\n\n[OUTPUT TRUNCATED - Original length: {len(output)} characters, showing first {max_length} characters]"
+    return truncated + warning
 
 def outputs_match(expected, actual):
     """

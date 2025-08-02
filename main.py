@@ -1,9 +1,11 @@
+# main.py - Main application for ByteBash v1 Py
+
 import streamlit as st
 import sys
 from io import StringIO
 from streamlit_ace import st_ace
 from problems import EXAMPLE_PROBLEMS
-from utils import load_logo, outputs_match
+from utils import load_logo, outputs_match, truncate_output
 
 def main():
     logo_base64 = load_logo()
@@ -178,7 +180,8 @@ def main():
                             return ""
                     namespace = {"input": mock_input, "__builtins__": __builtins__}
                     exec(code, namespace)
-                    output = sys.stdout.getvalue().strip()
+                    raw_output = sys.stdout.getvalue()
+                    output = truncate_output(raw_output).strip()
                     passed = outputs_match(expected_output, output)
                     if passed:
                         passed_count += 1
