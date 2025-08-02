@@ -373,7 +373,7 @@ with col_branding:
             <img src="data:image/png;base64,{logo_base64}" 
                  style="width: 120px; margin-bottom: 8px;">
             <div style="font-size: 18px; font-weight: 600;">🏢 ByteXL Internal Tool</div>
-            <div style="font-size: 14px;">Version: 1.0</div>
+            <div style="font-size: 14px;">Version: 1.6</div>
             <div style="font-size: 14px; color: #aaa;">Validating code. Empowering content.</div>
         </div>
         """, unsafe_allow_html=True)
