@@ -223,23 +223,38 @@ with col_tests:
     st.markdown('<div class="scrollable-test-cases">', unsafe_allow_html=True)
     test_cases = []
     for i in range(7):
-        st.markdown(f'<div class="test-case-header">Test Case {i+1}</div>', unsafe_allow_html=True)
-        default_input = st.session_state.test_cases[i][0]
-        default_output = st.session_state.test_cases[i][1]
-        test_input = st.text_area(
-            f"Input {i+1}:",
-            height=80,
-            key=f"input_{i}",
-            placeholder="One input per line",
-            value=default_input
-        )
-        expected_output = st.text_area(
-            f"Expected Output {i+1}:",
-            height=80,
-            key=f"expected_{i}",
-            placeholder="Expected output here",
-            value=default_output
-        )
+        # Create badge column layout
+        badge_col, content_col = st.columns([0.15, 0.85])
+        
+        with badge_col:
+            # Show status badge if tests have been run
+            if 'test_results' in st.session_state and i < len(st.session_state.test_results):
+                result = st.session_state.test_results[i]
+                if result['passed']:
+                    st.markdown("🟢 **PASS**", unsafe_allow_html=True)
+                else:
+                    st.markdown("🔴 **FAIL**", unsafe_allow_html=True)
+            else:
+                st.markdown("⚪ **—**", unsafe_allow_html=True)
+        
+        with content_col:
+            st.markdown(f'<div class="test-case-header">Test Case {i+1}</div>', unsafe_allow_html=True)
+            default_input = st.session_state.test_cases[i][0]
+            default_output = st.session_state.test_cases[i][1]
+            test_input = st.text_area(
+                f"Input {i+1}:",
+                height=80,
+                key=f"input_{i}",
+                placeholder="One input per line",
+                value=default_input
+            )
+            expected_output = st.text_area(
+                f"Expected Output {i+1}:",
+                height=80,
+                key=f"expected_{i}",
+                placeholder="Expected output here",
+                value=default_output
+            )
         test_cases.append((test_input, expected_output))
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -249,6 +264,7 @@ if run_tests:
         st.error("Please enter your Python code first.")
     else:
         results, passed_count = [], 0
+        test_results_for_badges = []
         for idx, (test_input, expected_output) in enumerate(test_cases, start=1):
             old_stdout = sys.stdout
             sys.stdout = StringIO()
@@ -266,10 +282,15 @@ if run_tests:
                 if passed:
                     passed_count += 1
                 results.append((test_input, expected_output, output, passed))
+                test_results_for_badges.append({'passed': passed, 'output': output})
             except Exception as e:
                 results.append((test_input, expected_output, f"Error: {e}", False))
+                test_results_for_badges.append({'passed': False, 'output': f"Error: {e}"})
             finally:
                 sys.stdout = old_stdout
+        
+        # Store results for badges
+        st.session_state.test_results = test_results_for_badges
 
         # Summary
         st.subheader(f"Results: {passed_count}/7 Tests Passed")
