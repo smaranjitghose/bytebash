@@ -119,12 +119,28 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🚀 Future Enhancements
 
+- [ ] Whitespace-insensitive & multi-line matching
+- [ ] Numeric-close comparison (floating point tolerance)
+- [ ] Pass/fail badges inline next to each test case
+- [ ] Highlight failed outputs in red, passed in green
+- [ ] Quick Start button to auto-load & run default example
+- [ ] Syntax highlighting, line numbers, auto-indent in code editor
+- [ ] Add/remove test cases dynamically
+- [ ] Optional auto-run tests on code change
+- [ ] Collapsible example descriptions
+- [ ] Resizable test case panel
+- [ ] Side-by-side diff view for expected vs actual output
+- [ ] Execution time tracking per test case
+- [ ] Display total runtime & slowest test case
+- [ ] Save & load test case sets as JSON
+- [ ] Batch run all examples with results dashboard
+- [ ] Group test cases (edge cases, performance cases)
+- [ ] Tagging system for test cases
+- [ ] Timeout handling for infinite loops
+- [ ] Basic memory usage reporting
 - [ ] Support for multiple programming languages
 - [ ] Database integration for test case management
 - [ ] User authentication and role-based access
-- [ ] Export functionality for test results
-- [ ] Integration with ByteXL's learning management system
-- [ ] Advanced code analysis and performance metrics
 
 ## 🆘 Support
 
