@@ -119,9 +119,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🚀 Future Enhancements
 
-- [ ] Whitespace-insensitive & multi-line matching
-- [ ] Numeric-close comparison (floating point tolerance)
-- [ ] Pass/fail badges inline next to each test case
+- [x] Whitespace-insensitive & multi-line matching
+- [x] Numeric-close comparison (floating point tolerance)
 - [ ] Highlight failed outputs in red, passed in green
 - [ ] Quick Start button to auto-load & run default example
 - [ ] Syntax highlighting, line numbers, auto-indent in code editor
